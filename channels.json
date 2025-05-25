@@ -1,0 +1,16 @@
+{
+    "sources": {
+        "example1.xml": "https://example.com/epg.xml.gz",
+        "example2.xml": "https://example.com/epg.xml"
+    },
+    "channels": {
+        "channel.1": {
+            "source_file": "example1.xml",
+            "output_id": "Channel 1"
+        },
+        "channel.2": {
+            "source_file": "example2.xml",
+            "output_id": "Channel 2"
+        }
+    }
+}

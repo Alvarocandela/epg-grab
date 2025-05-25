@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# EPG data files (downloaded automatically)
+xml/*.xml
+!xml/.gitkeep
+
+# Output files
+combined.xml
+*.xml
+
+# Log files
+*.log
+epg_update.log
+
+# Temporary files
+*.tmp
+*.tmp.*
+.DS_Store
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
