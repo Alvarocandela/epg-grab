@@ -325,17 +325,6 @@ For issues and questions, please check the troubleshooting section above or crea
 - **User-Agent Headers**: Fixes 403 errors from some EPG servers
 - **Cron-Friendly**: Default behavior perfect for automated updates
 
-**Old workflow:**
-```bash
-./xml/update_epg.sh
-python3 xmltv_merger.py --skip-download
-```
-
-**New workflow:**
-```bash
-python3 xmltv_merger.py
-```
-
 ## Quick Setup
 
 ```bash
