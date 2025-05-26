@@ -33,6 +33,434 @@ class XMLTVMerger:
         self.requested_channels = {}  # Tracks requested channels by source file
         self.found_channels = {}  # Tracks found channels by source file
         
+        # Genre mapping for TVHeadend compatibility - Multilingual support
+        self.genre_mapping = {
+            # Spanish to English genre mappings
+            # Information/News categories
+            'Información/Informativo': 'News',
+            'Información/Reportaje': 'Documentary', 
+            'Información/Documental': 'Documentary',
+            'Información/Magazine': 'News Magazine',
+            'Información/Deportivo': 'Sports',
+            'Información/Meteorología': 'Weather',
+            'Información/Política': 'Politics',
+            
+            # Entertainment categories
+            'Entretenimiento/Corazon y sociedad': 'Talk Show',
+            'Entretenimiento/Humor': 'Comedy',
+            'Entretenimiento/Variedades': 'Entertainment',
+            'Entretenimiento/Concurso': 'Game Show',
+            'Entretenimiento/Reality show': 'Reality',
+            'Entretenimiento/Musical': 'Music',
+            
+            # Cinema/Movies
+            'Cine/Película': 'Movie',
+            'Cine/Drama': 'Drama',
+            'Cine/Comedia': 'Comedy',
+            'Cine/Acción': 'Action',
+            'Cine/Thriller': 'Thriller',
+            'Cine/Terror': 'Horror',
+            'Cine/Aventuras': 'Adventure',
+            'Cine/Ciencia ficción': 'Science Fiction',
+            'Cine/Romance': 'Romance',
+            'Cine/Western': 'Western',
+            'Cine/Bélico': 'War',
+            'Cine/Histórico': 'Historical',
+            'Cine/Comedia romántica': 'Romantic Comedy',
+            
+            # Sports
+            'Deportes': 'Sports',
+            'Deportes/Fútbol': 'Sports',
+            'Deportes/Motor': 'Motorsport',
+            'Deportes/Baloncesto': 'Sports',
+            'Deportes/Tenis': 'Sports',
+            'Deportes/Ciclismo': 'Sports',
+            
+            # Children's content
+            'Infantil/Dibujos animados': 'Animation',
+            'Infantil/Juvenil': 'Children',
+            'Infantil/Educativo': 'Educational',
+            
+            # Cultural/Educational
+            'Cultura/Arte': 'Arts',
+            'Cultura/Historia': 'Documentary',
+            'Cultura/Ciencia': 'Science',
+            'Cultura/Naturaleza': 'Nature',
+            'Cultura/Religioso': 'Religious',
+            
+            # Series/Fiction
+            'Serie/Drama': 'Drama',
+            'Serie/Comedia': 'Comedy',
+            'Serie/Policiaca': 'Crime',
+            'Serie/Acción': 'Action',
+            'Serie/Ciencia ficción': 'Science Fiction',
+            'Serie/Thriller': 'Thriller',
+            
+            # Lifestyle
+            'Ocio y Aficiones/Viajes': 'Travel',
+            'Ocio y Aficiones/Gastronomía': 'Food',
+            'Ocio y Aficiones/Decoración': 'Lifestyle',
+            'Ocio y Aficiones/Motor': 'Automotive',
+            'Ocio y Aficiones/Naturaleza': 'Nature',
+            'Ocio y Aficiones/Juegos': 'Game Show',
+            
+            # Music and Arts
+            'Música': 'Music',
+            'Música/Pop-Rock': 'Music',
+            'Música/Clásica': 'Classical Music',
+            'Música/Jazz': 'Music',
+            'Teatro': 'Performing Arts',
+            'Danza': 'Performing Arts',
+            'Opera': 'Performing Arts',
+            
+            # Other common Spanish genres
+            'Telenovela': 'Soap Opera',
+            'Magacín': 'Magazine',
+            'Debate': 'Talk Show',
+            'Educativo': 'Educational',
+            'Religioso': 'Religious',
+            'Erótico': 'Adult',
+            
+            # Handle slash variations (both directions)
+            'Viajes': 'Travel',
+            'Reportaje': 'Documentary',
+            'Informativo': 'News',
+            'Corazón y sociedad': 'Talk Show',
+            'Humor': 'Comedy',
+            'Variedades': 'Entertainment',
+            'Concurso': 'Game Show',
+            'Reality show': 'Reality',
+            'Musical': 'Music',
+            'Película': 'Movie',
+            'Drama': 'Drama',
+            'Comedia': 'Comedy',
+            'Acción': 'Action',
+            'Thriller': 'Thriller',
+            'Terror': 'Horror',
+            'Aventuras': 'Adventure',
+            'Ciencia ficción': 'Science Fiction',
+            'Romance': 'Romance',
+            'Western': 'Western',
+            'Bélico': 'War',
+            'Histórico': 'Historical',
+            'Fútbol': 'Sports',
+            'Motor': 'Motorsport',
+            'Baloncesto': 'Sports',
+            'Tenis': 'Sports',
+            'Ciclismo': 'Sports',
+            'Dibujos animados': 'Animation',
+            'Juvenil': 'Children',
+            'Arte': 'Arts',
+            'Historia': 'Documentary',
+            'Ciencia': 'Science',
+            'Naturaleza': 'Nature',
+            'Policiaca': 'Crime',
+            'Gastronomía': 'Food',
+            'Decoración': 'Lifestyle',
+            
+            # Additional mappings found in Spanish EPG
+            'Entretenimiento': 'Entertainment',
+            'Series/Policíaca': 'Crime',
+            'Ocio y Aficiones/Cocina': 'Food',
+            'Documental/Otros': 'Documentary',
+            'Serie/Telenovela': 'Soap Opera',
+            'Cocina': 'Food',
+            'Otros': 'Other',
+            
+            # German genre mappings
+            'Krimi': 'Crime',
+            'Krimiserie': 'Crime',
+            'Kriminalfilm': 'Crime',
+            'Abenteuer': 'Adventure',
+            'Action': 'Action',
+            'Actionfilm': 'Action',
+            'Actionkomödie': 'Action',
+            'Actionserie': 'Action',
+            'Actionthriller': 'Action',
+            'Animation': 'Animation',
+            'Animationsfilm': 'Animation',
+            'Animationsserie': 'Animation',
+            'Aktuelles': 'News',
+            'Nachrichten': 'News',
+            'Dokumentation': 'Documentary',
+            'Dokufilm': 'Documentary',
+            'Dokuserie': 'Documentary',
+            'Dokumentarfilm': 'Documentary',
+            'Komödie': 'Comedy',
+            'Komödienfilm': 'Comedy',
+            'Komödienserie': 'Comedy',
+            'Drama': 'Drama',
+            'Dramafilm': 'Drama',
+            'Dramaserie': 'Drama',
+            'Thriller': 'Thriller',
+            'Psychothriller': 'Thriller',
+            'Thrillerserie': 'Thriller',
+            'Horror': 'Horror',
+            'Horrorfilm': 'Horror',
+            'Horrorserie': 'Horror',
+            'Science Fiction': 'Science Fiction',
+            'Science-Fiction': 'Science Fiction',
+            'Sci-Fi': 'Science Fiction',
+            'Fantasy': 'Fantasy',
+            'Fantasyfilm': 'Fantasy',
+            'Fantasyserie': 'Fantasy',
+            'Romantik': 'Romance',
+            'Liebesfilm': 'Romance',
+            'Liebesdrama': 'Romance',
+            'Western': 'Western',
+            'Westernfilm': 'Western',
+            'Westernserie': 'Western',
+            'Kriegsfilm': 'War',
+            'Kriegsdrama': 'War',
+            'Historienfilm': 'Historical',
+            'Sport': 'Sports',
+            'Sportsendung': 'Sports',
+            'Fußball': 'Sports',
+            'Motorsport': 'Motorsport',
+            'Autorennen': 'Motorsport',
+            'Musik': 'Music',
+            'Musiksendung': 'Music',
+            'Musikfilm': 'Music',
+            'Konzert': 'Music',
+            'Kindersendung': 'Children',
+            'Kinderfilm': 'Children',
+            'Kinderserie': 'Children',
+            'Jugendserie': 'Children',
+            'Jugendfilm': 'Children',
+            'Bildung': 'Educational',
+            'Bildungsprogramm': 'Educational',
+            'Wissenschaft': 'Science',
+            'Natur': 'Nature',
+            'Naturdokumentation': 'Nature',
+            'Tierdokumentation': 'Nature',
+            'Reise': 'Travel',
+            'Reisebericht': 'Travel',
+            'Reisedokumentation': 'Travel',
+            'Kochsendung': 'Food',
+            'Kochen': 'Food',
+            'Lifestyle': 'Lifestyle',
+            'Magazine': 'Magazine',
+            'Magazin': 'Magazine',
+            'Talk': 'Talk Show',
+            'Talkshow': 'Talk Show',
+            'Show': 'Entertainment',
+            'Unterhaltung': 'Entertainment',
+            'Quiz': 'Game Show',
+            'Gameshow': 'Game Show',
+            'Reality-TV': 'Reality',
+            'Reality': 'Reality',
+            'Soap': 'Soap Opera',
+            'Seifenoper': 'Soap Opera',
+            'Telenovela': 'Soap Opera',
+            
+            # Italian genre mappings
+            'Animazione': 'Animation',
+            'Cartoni Animati': 'Animation',
+            'Anime': 'Animation',
+            'Azione': 'Action',
+            'Avventura': 'Adventure',
+            'Commedia': 'Comedy',
+            'Drammatico': 'Drama',
+            'Dramma': 'Drama',
+            'Thriller': 'Thriller',
+            'Horror': 'Horror',
+            'Fantascienza': 'Science Fiction',
+            'Fantasy': 'Fantasy',
+            'Romantico': 'Romance',
+            'Western': 'Western',
+            'Guerra': 'War',
+            'Storico': 'Historical',
+            'Poliziesco': 'Crime',
+            'Giallo': 'Crime',
+            'Documentario': 'Documentary',
+            'Notizie': 'News',
+            'Attualità': 'News',
+            'Sport': 'Sports',
+            'Calcio': 'Sports',
+            'Motori': 'Motorsport',
+            'Musica': 'Music',
+            'Ragazzi e Musica': 'Children',
+            'Bambini': 'Children',
+            'Educativo': 'Educational',
+            'Scienza': 'Science',
+            'Natura': 'Nature',
+            'Viaggi': 'Travel',
+            'Cucina': 'Food',
+            'Lifestyle': 'Lifestyle',
+            'Magazine': 'Magazine',
+            'Talk Show': 'Talk Show',
+            'Spettacolo': 'Entertainment',
+            'Intrattenimento': 'Entertainment',
+            'Quiz': 'Game Show',
+            'Reality': 'Reality',
+            'Soap Opera': 'Soap Opera',
+            'Telenovela': 'Soap Opera',
+            'Serie TV': 'Series',
+            'Film': 'Movie',
+            'Altri Programmi': 'Other',
+            'Altri': 'Other',
+            'Altro': 'Other',
+            'Giochi': 'Game Show',
+            'Mondo e Tendenze': 'Entertainment',
+            
+            # Dutch genre mappings
+            'Actie': 'Action',
+            'Actiekomedie': 'Action',
+            'Actieserie': 'Action',
+            'Avontuur': 'Adventure',
+            'Komedie': 'Comedy',
+            'Drama': 'Drama',
+            'Thriller': 'Thriller',
+            'Horror': 'Horror',
+            'Science Fiction': 'Science Fiction',
+            'Fantasy': 'Fantasy',
+            'Romantiek': 'Romance',
+            'Western': 'Western',
+            'Oorlog': 'War',
+            'Historisch': 'Historical',
+            'Misdaad': 'Crime',
+            'Documentaire': 'Documentary',
+            'Nieuws': 'News',
+            'Actualiteiten': 'News',
+            'Sport': 'Sports',
+            'Voetbal': 'Sports',
+            'Motorsport': 'Motorsport',
+            'Muziek': 'Music',
+            'Kinderen': 'Children',
+            'Jeugd': 'Children',
+            'Animatie': 'Animation',
+            'Animatieserie': 'Animation',
+            'Educatief': 'Educational',
+            'Wetenschap': 'Science',
+            'Natuur': 'Nature',
+            'Reizen': 'Travel',
+            'Koken': 'Food',
+            'Lifestyle': 'Lifestyle',
+            'Magazine': 'Magazine',
+            'Talkshow': 'Talk Show',
+            'Amusement': 'Entertainment',
+            'Entertainment': 'Entertainment',
+            'Quiz': 'Game Show',
+            'Reality': 'Reality',
+            'Soap': 'Soap Opera',
+            'Serie': 'Series',
+            'Film': 'Movie',
+            
+            # French genre mappings (common ones)
+            'Action': 'Action',
+            'Aventure': 'Adventure',
+            'Comédie': 'Comedy',
+            'Drame': 'Drama',
+            'Thriller': 'Thriller',
+            'Horreur': 'Horror',
+            'Science-fiction': 'Science Fiction',
+            'Fantastique': 'Fantasy',
+            'Romance': 'Romance',
+            'Western': 'Western',
+            'Guerre': 'War',
+            'Historique': 'Historical',
+            'Policier': 'Crime',
+            'Documentaire': 'Documentary',
+            'Actualités': 'News',
+            'Informations': 'News',
+            'Sport': 'Sports',
+            'Football': 'Sports',
+            'Automobile': 'Motorsport',
+            'Musique': 'Music',
+            'Jeunesse': 'Children',
+            'Animation': 'Animation',
+            'Éducatif': 'Educational',
+            'Science': 'Science',
+            'Nature': 'Nature',
+            'Voyage': 'Travel',
+            'Cuisine': 'Food',
+            'Lifestyle': 'Lifestyle',
+            'Magazine': 'Magazine',
+            'Talk-show': 'Talk Show',
+            'Divertissement': 'Entertainment',
+            'Jeu': 'Game Show',
+            'Téléréalité': 'Reality',
+            'Feuilleton': 'Soap Opera',
+            'Série': 'Series',
+            'Film': 'Movie',
+            
+            # Portuguese genre mappings (common ones)
+            'Ação': 'Action',
+            'Aventura': 'Adventure',
+            'Comédia': 'Comedy',
+            'Drama': 'Drama',
+            'Thriller': 'Thriller',
+            'Terror': 'Horror',
+            'Ficção Científica': 'Science Fiction',
+            'Fantasia': 'Fantasy',
+            'Romance': 'Romance',
+            'Western': 'Western',
+            'Guerra': 'War',
+            'Histórico': 'Historical',
+            'Policial': 'Crime',
+            'Documentário': 'Documentary',
+            'Notícias': 'News',
+            'Atualidades': 'News',
+            'Desporto': 'Sports',
+            'Futebol': 'Sports',
+            'Automobilismo': 'Motorsport',
+            'Música': 'Music',
+            'Infantil': 'Children',
+            'Animação': 'Animation',
+            'Educativo': 'Educational',
+            'Ciência': 'Science',
+            'Natureza': 'Nature',
+            'Viagem': 'Travel',
+            'Culinária': 'Food',
+            'Lifestyle': 'Lifestyle',
+            'Magazine': 'Magazine',
+            'Talk Show': 'Talk Show',
+            'Entretenimento': 'Entertainment',
+            'Quiz': 'Game Show',
+            'Reality Show': 'Reality',
+            'Telenovela': 'Soap Opera',
+            'Série': 'Series',
+            'Filme': 'Movie',
+            
+            # Polish genre mappings (common ones)
+            'Akcja': 'Action',
+            'Przygodowy': 'Adventure',
+            'Komedia': 'Comedy',
+            'Dramat': 'Drama',
+            'Thriller': 'Thriller',
+            'Horror': 'Horror',
+            'Science Fiction': 'Science Fiction',
+            'Fantasy': 'Fantasy',
+            'Romans': 'Romance',
+            'Western': 'Western',
+            'Wojenny': 'War',
+            'Historyczny': 'Historical',
+            'Kryminalny': 'Crime',
+            'Dokumentalny': 'Documentary',
+            'Wiadomości': 'News',
+            'Aktualności': 'News',
+            'Sport': 'Sports',
+            'Piłka nożna': 'Sports',
+            'Motorsport': 'Motorsport',
+            'Muzyka': 'Music',
+            'Dla dzieci': 'Children',
+            'Animacja': 'Animation',
+            'Edukacyjny': 'Educational',
+            'Nauka': 'Science',
+            'Przyroda': 'Nature',
+            'Podróże': 'Travel',
+            'Kuchnia': 'Food',
+            'Lifestyle': 'Lifestyle',
+            'Magazyn': 'Magazine',
+            'Talk-show': 'Talk Show',
+            'Rozrywka': 'Entertainment',
+            'Quiz': 'Game Show',
+            'Reality show': 'Reality',
+            'Opera mydlana': 'Soap Opera',
+            'Serial': 'Series',
+            'Film': 'Movie'
+        }
+        
     def download_epg_sources(self, xml_dir: Path, force_download: bool = False) -> None:
         """Download EPG files from configured URLs with auto-compression detection."""
         if not self.sources_config:
@@ -386,10 +814,12 @@ class XMLTVMerger:
             
             # Add extracted categories if none exist
             if not category_elems and extracted_info.get('genre'):
+                # Map Spanish genre to English for TVHeadend compatibility
+                mapped_genre = self._map_genre_to_english(extracted_info['genre'])
                 new_category = ET.SubElement(new_programme, 'category')
-                new_category.text = extracted_info['genre']
-                if desc_elem.get('lang'):
-                    new_category.set('lang', desc_elem.get('lang'))
+                new_category.text = mapped_genre
+                # Use English language for mapped genres
+                new_category.set('lang', 'en')
             
             # Add date if extracted and no episode info exists
             if extracted_info.get('year') and not episode_num_elem:
@@ -410,13 +840,15 @@ class XMLTVMerger:
                 value_elem = ET.SubElement(new_rating, 'value')
                 value_elem.text = extracted_info['rating']
         
-        # Copy existing categories
+        # Copy existing categories with genre mapping
         for category in category_elems:
             if category.text and category.text.strip():
+                # Map Spanish genre to English for TVHeadend compatibility
+                mapped_genre = self._map_genre_to_english(category.text.strip())
                 new_category = ET.SubElement(new_programme, 'category')
-                new_category.text = category.text.strip()
-                if category.get('lang'):
-                    new_category.set('lang', category.get('lang'))
+                new_category.text = mapped_genre
+                # Use English language for mapped genres
+                new_category.set('lang', 'en')
         
         # Copy episode information
         if episode_num_elem is not None and episode_num_elem.text:
@@ -746,8 +1178,45 @@ class XMLTVMerger:
             print("\n" + "="*60)
             print("Use --list-channels to see all available channels")
             print("="*60 + "\n")
-
-
+    
+    def _map_genre_to_english(self, spanish_genre: str) -> str:
+        """Map Spanish genre to English equivalent for TVHeadend compatibility."""
+        if not spanish_genre:
+            return spanish_genre
+            
+        # Clean the genre string
+        genre = spanish_genre.strip()
+        
+        # Try exact match first
+        if genre in self.genre_mapping:
+            return self.genre_mapping[genre]
+        
+        # Try partial matches for slash-separated genres (e.g., "Información/Reportaje")
+        # Check if it's a compound genre with slash
+        if '/' in genre:
+            # Try the full compound genre first
+            if genre in self.genre_mapping:
+                return self.genre_mapping[genre]
+            
+            # Try just the second part (more specific genre)
+            parts = genre.split('/')
+            if len(parts) >= 2:
+                second_part = parts[1].strip()
+                if second_part in self.genre_mapping:
+                    return self.genre_mapping[second_part]
+                
+                # Try the first part as fallback
+                first_part = parts[0].strip()
+                if first_part in self.genre_mapping:
+                    return self.genre_mapping[first_part]
+        
+        # Try case-insensitive match
+        for spanish, english in self.genre_mapping.items():
+            if genre.lower() == spanish.lower():
+                return english
+        
+        # If no mapping found, return original but cleaned
+        return genre
 def main():
     parser = argparse.ArgumentParser(
         description="Merge XMLTV files and filter channels with automatic EPG download support",
